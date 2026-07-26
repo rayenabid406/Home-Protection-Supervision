@@ -19,8 +19,8 @@ disconnects the load).
 ## System Architecture
 
 ```
-Voltage: AC line → Step-down transformer → Voltage divider → RC filter → Arduino A0
-Current: AC line → ACS712 Hall-effect sensor → Arduino A1
+Voltage: AC line → Step-down transformer (TR1) → Voltage divider (R1-R4) → RC filter (C1) → Arduino A0
+Current: AC line → ACS712 Hall-effect sensor (U1) → Arduino A1
                               │
                     RMS calculation (V, I, P)
                               │
@@ -28,8 +28,8 @@ Current: AC line → ACS712 Hall-effect sensor → Arduino A1
                     ┌─────────┴─────────┐
                 Normal                Fault
                   │                     │
-          LCD shows V/I/P      LED + buzzer alert
-                              Relay disconnects load
+          LCD shows V/I/P      LED (OC/OV) + buzzer alert
+                              Relay (RL2) disconnects load
 ```
 
 ## Hardware (as simulated)
@@ -37,11 +37,11 @@ Current: AC line → ACS712 Hall-effect sensor → Arduino A1
 | Component | Role |
 |---|---|
 | Arduino UNO | Processing + decision logic |
-| ACS712 | AC current sensing (Hall-effect) |
-| Voltage transformer + divider + RC filter | AC voltage sensing, scaled and smoothed for ADC |
+| ACS712 (U1) | AC current sensing (Hall-effect) |
+| Transformer (TR1) + voltage divider (R1-R4) + RC filter (C1) | AC voltage sensing, scaled and smoothed for ADC |
 | 16x2 LCD | Live voltage/current/power display |
-| LEDs + buzzer | OV/OC alert indicators |
-| Electromechanical relay | Automatic load disconnection on fault |
+| LEDs (OC, OV) + buzzer | Fault indicators |
+| Relay (RL2) | Automatic load disconnection on fault |
 
 ## Fault Handling
 
@@ -54,15 +54,18 @@ Current: AC line → ACS712 Hall-effect sensor → Arduino A1
 
 ## Simulated Verification
 
-- Overvoltage and overcurrent conditions injected in Proteus to confirm 
-  detection and relay trip behavior
-- Confirmed the RMS calculation tracked expected values under simulated 
-  fault conditions
+**Normal operation** — system idle, no faults:
 
-## Screenshots
+![Normal Operation](Normal_Operation.png)
 
-- `Normal Operation.png` — LCD display under normal voltage/current
-- `Auto-open-of-relay-contact-when-OC.png` — relay trip on simulated overcurrent
+`V = 222V, I = 3.29A, P = 730W` — nominal household-range values, no OC/OV flags raised.
+
+**Fault condition** — simulated overvoltage + overcurrent injected simultaneously:
+
+![Relay Trip on Overcurrent](Auto-open_of-realy-contact_when-oc.png)
+
+`V = 441V, I = 5.38A, P = 2373W` — both OC and OV flags trigger on the LCD, 
+relay opens to disconnect the load, LEDs and buzzer activate.
 
 ## Limitations & Next Steps
 
@@ -71,6 +74,8 @@ Current: AC line → ACS712 Hall-effect sensor → Arduino A1
 - No datalogging or remote monitoring — planned future direction if this 
   moves to a physical build
 - Fixed thresholds only — no calibration routine for different installations
+- Only tested with OC and OV triggered together — worth simulating each 
+  fault independently to confirm isolated detection logic
 
 ## Stack
 
