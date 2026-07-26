@@ -56,13 +56,13 @@ Current: AC line → ACS712 Hall-effect sensor (U1) → Arduino A1
 
 **Normal operation** — system idle, no faults:
 
-![Normal Operation](Normal_Operation.png)
+![Normal Operation](normal-operation.png)
 
 `V = 222V, I = 3.29A, P = 730W` — nominal household-range values, no OC/OV flags raised.
 
 **Fault condition** — simulated overvoltage + overcurrent injected simultaneously:
 
-![Relay Trip on Overcurrent](Auto-open_of-realy-contact_when-oc.png)
+![Relay Trip on Overcurrent](relay-trip-overcurrent.png)
 
 `V = 441V, I = 5.38A, P = 2373W` — both OC and OV flags trigger on the LCD, 
 relay opens to disconnect the load, LEDs and buzzer activate.
