@@ -1,121 +1,77 @@
-Project Overview:
+# Home Electrical Protection & Supervision (Proteus Simulation)
 
-Supervising electrical systems is essential for safety and efficiency. Monitoring voltage, current, and power helps to:
+A circuit-level design and simulation for real-time AC voltage/current 
+monitoring with automatic overload protection, built and verified in 
+**Proteus** (`homeprotectionsupervisionV2.pdsprj`).
 
-Ensure the safety of electrical installations
+> **Note:** This is a simulation/circuit-design project, not a built 
+> physical device. It demonstrates the sensing, threshold-detection, and 
+> protection logic at the schematic level, verified through Proteus's 
+> simulated fault injection rather than on physical hardware.
 
-Optimize energy use
+## What It Does
 
-Prevent overloads and damage
+Monitors AC voltage and current in real time and reacts to two fault 
+conditions — overvoltage (OV) and overcurrent (OC) — with both a local 
+alert (LCD, LED, buzzer) and an automatic protective action (relay 
+disconnects the load).
 
-This project uses an Arduino to create a simple and cost-effective system that measures AC voltage and current in real time, detects overvoltage and overcurrent, alerts the user, and performs automatic protection.
+## System Architecture
 
-Applications:
+```
+Voltage: AC line → Step-down transformer → Voltage divider → RC filter → Arduino A0
+Current: AC line → ACS712 Hall-effect sensor → Arduino A1
+                              │
+                    RMS calculation (V, I, P)
+                              │
+                  Compare against OV/OC thresholds
+                    ┌─────────┴─────────┐
+                Normal                Fault
+                  │                     │
+          LCD shows V/I/P      LED + buzzer alert
+                              Relay disconnects load
+```
 
-Residential buildings: prevent electrical fires and equipment damage
+## Hardware (as simulated)
 
-Industrial environments: monitor machinery and optimize energy usage
+| Component | Role |
+|---|---|
+| Arduino UNO | Processing + decision logic |
+| ACS712 | AC current sensing (Hall-effect) |
+| Voltage transformer + divider + RC filter | AC voltage sensing, scaled and smoothed for ADC |
+| 16x2 LCD | Live voltage/current/power display |
+| LEDs + buzzer | OV/OC alert indicators |
+| Electromechanical relay | Automatic load disconnection on fault |
 
-Power distribution networks: support network stability
+## Fault Handling
 
-System Features:
+- **Overvoltage / overcurrent detection**: RMS voltage and current are 
+  computed from sampled ADC readings and compared against fixed safety 
+  thresholds.
+- **Relay trip**: on either fault, the relay opens to disconnect the load 
+  before alerting — protection takes priority over notification, since a 
+  buzzer with no reaction is worthless if the hardware is already at risk.
 
-Real-time measurements
+## Simulated Verification
 
-Voltage sensor for AC voltage
+- Overvoltage and overcurrent conditions injected in Proteus to confirm 
+  detection and relay trip behavior
+- Confirmed the RMS calculation tracked expected values under simulated 
+  fault conditions
 
-ACS712 sensor for AC current
+## Screenshots
 
-Automatic anomaly detection
+- `Normal Operation.png` — LCD display under normal voltage/current
+- `Auto-open-of-relay-contact-when-OC.png` — relay trip on simulated overcurrent
 
-Detects overvoltage (OV)
+## Limitations & Next Steps
 
-Detects overcurrent (OC)
+- Not yet built on physical hardware — real-world ADC noise, transformer 
+  ripple, and relay switching transients aren't captured by the simulation
+- No datalogging or remote monitoring — planned future direction if this 
+  moves to a physical build
+- Fixed thresholds only — no calibration routine for different installations
 
-User notifications:
+## Stack
 
-LCD display shows voltage, current, and power
-
-LEDs and buzzer for alerts
-
-Active protection:
-
-Relay disconnects the load automatically if an anomaly is detected
-
-Hardware Components:
-
-Arduino UNO
-
-ACS712 current sensor
-
-Voltage sensor
-
-16x2 LCD display
-
-Buzzer and LEDs
-
-Electromechanical relay
-
-Supporting components (resistors, capacitors, wires)
-
-System Architecture:
-
-1. Measurement:
-
-Voltage: Transformer → Voltage Divider → RC Filter → Arduino A0
-
-Current: ACS712 → Arduino A1
-
-2. Processing:
-
-Calculate RMS voltage, current, and power
-
-Compare values to predefined safety thresholds
-
-Decide in real time if action is needed
-
-3. Action:
-
-Normal mode: display values on LCD
-
-Alert mode:
-
-LED indicators for OV/OC
-
-Buzzer alert
-
-Relay disconnects load
-
-Advantages:
-
-Fast reaction time (milliseconds)
-
-Dual protection: alert + automatic disconnection
-
-Simple and easy-to-use interface
-
-Affordable solution
-
-How to Use:
-
-Connect sensors and components to the Arduino as described.
-
-Upload the Arduino code.
-
-Power the system to monitor voltage and current.
-
-In case of overvoltage or overcurrent, the system triggers alerts and disconnects the load automatically.
-
-Test & Simulation:
-
-Simulated overvoltage and overcurrent conditions
-
-Verified fast response and accurate RMS calculations
-
-Confirmed proper relay operation for load protection
-
-Conclusion:
-
-This project demonstrates a home electrical supervision system that monitors and protects electrical networks in real time. It is suitable for domestic use and small industrial applications.
-
-Further improvements could include remote monitoring, data logging, or mobile alerts for a more advanced smart home system.
+Arduino UNO, ACS712, Proteus (schematic capture + simulation)
